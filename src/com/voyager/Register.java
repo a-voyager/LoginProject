@@ -20,7 +20,14 @@ public class Register extends HttpServlet {
 		response.setContentType("text/html;charset=utf-8");
 		String user = request.getParameter("user");
 		String pwd = request.getParameter("pwd");
-
+		System.out.println("user = " + user + "; pwd = " + pwd);
+		if (!Utils.isUserNameQualifiedRule(user)
+				|| !Utils.isUserPwdQualifiedRule(pwd)) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+					"user || pwd is not qualified"); // 返回400 客户端句法不合法
+			return;
+		}
+		
 	}
 
 }
