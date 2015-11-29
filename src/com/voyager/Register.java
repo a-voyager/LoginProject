@@ -28,8 +28,11 @@ public class Register extends HttpServlet {
 			return;
 		}
 		UserPwdDao userPwdDao = new UserPwdDao();
-		userPwdDao.addNewUser(user, pwd);
+		boolean isSucceed = userPwdDao.addNewUser(user, pwd);
 		userPwdDao.dispose();
+		if (isSucceed) {
+			response.addHeader("result", "1");
+		}
 	}
 
 }
