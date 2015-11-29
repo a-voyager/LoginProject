@@ -27,7 +27,9 @@ public class Register extends HttpServlet {
 					"user || pwd is not qualified"); // 返回400 客户端句法不合法
 			return;
 		}
-		
+		UserPwdDao userPwdDao = new UserPwdDao();
+		userPwdDao.addNewUser(user, pwd);
+		userPwdDao.dispose();
 	}
 
 }

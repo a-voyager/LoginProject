@@ -1,10 +1,16 @@
 package com.voyager;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.Properties;
+
+import javax.servlet.http.HttpServlet;
 
 /**
  * 数据库操作类
@@ -20,15 +26,28 @@ public class UserPwdDao {
 	private Connection conn;
 
 	public UserPwdDao() {
+		Properties properties = new Properties();
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
+			properties.load(new FileInputStream(new File(UserPwdDao.class
+					.getClassLoader().getResource("config.properties")
+					.getPath())));
+			System.out.println(properties.getProperty("SQLDriver"));
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		try {
+			Class.forName(properties.getProperty("SQLDriver"));
 		} catch (ClassNotFoundException e) {
 			System.out.println("MySql load failed.");
 			e.printStackTrace();
 		}
 		try {
 			conn = DriverManager.getConnection(
-					"jdbc:mysql://localhost:3306/users", "root", "root");
+					properties.getProperty("SQLAddr"),
+					properties.getProperty("SQLUserName"),
+					properties.getProperty("SQLUserPwd"));
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -55,7 +74,8 @@ public class UserPwdDao {
 			return false;
 		} finally {
 			try {
-				statement.close();
+				if (statement != null)
+					statement.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
