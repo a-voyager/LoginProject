@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServlet;
@@ -73,14 +75,55 @@ public class UserPwdDao {
 		} catch (SQLException e) {
 			return false;
 		} finally {
-			try {
-				if (statement != null)
-					statement.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			closeStatement(statement);
 		}
 		return true;
+	}
+
+	/**
+	 * 查询用户名密码是否正确
+	 * 
+	 * @param inputName
+	 * @param inputPwd
+	 * @return
+	 */
+	public boolean isUserQualifiedQuery(String inputName, String inputPwd) {
+		boolean flag = false;
+		Statement statement = null;
+		try {
+			statement = conn.createStatement();
+			ResultSet set = statement
+					.executeQuery("select name,pwd from users");
+			System.out.println("开始查询！");
+			while (set.next()) {
+				String name = set.getString("name");
+				String pwd = set.getString("pwd");
+				System.out.println("name = " + name + "; pwd = " + pwd);
+				if (name.equals(inputName) && pwd.equals(inputPwd)) {
+					System.out.println("密码正确！");
+					flag = true;
+					break;
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			closeStatement(statement);
+		}
+
+		return flag;
+	}
+
+	private void closeStatement(Statement statement) {
+		if (statement != null)
+			try {
+				statement.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				statement = null;
+			}
 	}
 
 	/**
